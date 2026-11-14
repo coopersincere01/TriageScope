@@ -1,6 +1,7 @@
 import os
 from flask import Flask, render_template, request
 from scoring import calculate_priority
+from guidance import build_explanation, build_checklist
 
 app = Flask(__name__)
 
@@ -55,6 +56,13 @@ def index():
         if not errors:
             result = calculate_priority(form_values)
             submitted = True
+
+            result["explanation"] = build_explanation(
+                form_values, result["priority"]
+            )
+            result["checklist"] = build_checklist(
+                form_values, result["priority"]
+            )
 
     return render_template(
         "index.html",
