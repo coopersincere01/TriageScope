@@ -68,6 +68,19 @@
         {% endfor %}
     </ul>
 
+
+    <section class="guidance-section">
+        <h4>Why This Priority Was Assigned</h4>
+        <p>{{ result.explanation }}</p>
+
+        <h4>Recommended First-Response Checklist</h4>
+        <ol>
+            {% for action in result.checklist %}
+            <li>{{ action }}</li>
+            {% endfor %}
+        </ol>
+    </section>
+
     <p class="result-notice">
         This is an educational, rule-based assessment,
         not a substitute for professional incident response.
