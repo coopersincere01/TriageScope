@@ -42,15 +42,39 @@
             </div>
             {% endif %}
 
-            {% if submitted %}
-            <div class="success-box" role="status">
-                <strong>Incident details submitted successfully.</strong>
-                <p>
-                    All required fields were validated.
-                    The priority assessment feature will be added next.
-                </p>
-            </div>
-            {% endif %}
+            
+{% if submitted and result %}
+<div class="success-box" role="status">
+    <strong>Incident details submitted successfully.</strong>
+    <p>All required fields were validated.</p>
+</div>
+
+<div class="assessment-result priority-{{ result.priority|lower }}">
+    <h3>{{ result.priority }} Priority</h3>
+
+    <p>
+        Assessment Score:
+        <strong>{{ result.score }} / {{ result.max_score }}</strong>
+    </p>
+
+    <h4>Factors That Influenced This Rating</h4>
+    <ul>
+        {% for factor in result.factors %}
+        <li>
+            <strong>{{ field_labels[factor.field] }}:</strong>
+            {{ factor.selection.replace('_', ' ').title() }}
+            ({{ factor.points }} points)
+        </li>
+        {% endfor %}
+    </ul>
+
+    <p class="result-notice">
+        This is an educational, rule-based assessment,
+        not a substitute for professional incident response.
+    </p>
+</div>
+{% endif %}
+
 
             <form method="POST" action="{{ url_for('index') }}">
 

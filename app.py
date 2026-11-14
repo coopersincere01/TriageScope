@@ -1,9 +1,10 @@
 import os
 from flask import Flask, render_template, request
+from scoring import calculate_priority
 
 app = Flask(__name__)
 
-# Accepted values for each incident intake field
+# Allowed incident intake values
 ALLOWED_VALUES = {
     "incident_type": {
         "phishing", "malware", "unauthorized_access"
@@ -29,11 +30,12 @@ FIELD_LABELS = {
 
 @app.route("/", methods=["GET", "POST"])
 def index():
-    """Display and validate the incident intake form."""
+    """Validate incident details and calculate an initial priority."""
 
     errors = []
     form_values = {}
     submitted = False
+    result = None
 
     if request.method == "POST":
 
@@ -51,13 +53,16 @@ def index():
                 )
 
         if not errors:
+            result = calculate_priority(form_values)
             submitted = True
 
     return render_template(
         "index.html",
         errors=errors,
         submitted=submitted,
-        form_values=form_values
+        form_values=form_values,
+        result=result,
+        field_labels=FIELD_LABELS
     ), 400 if errors else 200
 
 

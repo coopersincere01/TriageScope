@@ -181,3 +181,49 @@ footer {
 .success-box p {
     margin: 8px 0 0;
 }
+
+/* Priority assessment results */
+
+.assessment-result {
+    padding: 22px;
+    margin-bottom: 24px;
+    border: 1px solid var(--border);
+    border-left: 5px solid var(--blue);
+    border-radius: 8px;
+    background: #f8fafc;
+}
+
+.assessment-result h3 {
+    margin: 0 0 12px;
+    font-size: 22px;
+}
+
+.assessment-result h4 {
+    margin-bottom: 10px;
+}
+
+.assessment-result ul {
+    padding-left: 20px;
+}
+
+.assessment-result li {
+    margin-bottom: 8px;
+}
+
+.priority-low {
+    border-left-color: #15803d;
+}
+
+.priority-medium {
+    border-left-color: #d97706;
+}
+
+.priority-high {
+    border-left-color: #dc2626;
+}
+
+.result-notice {
+    color: var(--muted);
+    font-size: 13px;
+    margin-bottom: 0;
+}
