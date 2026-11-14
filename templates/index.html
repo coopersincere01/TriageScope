@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TriageScope | Incident Assessment</title>
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='styles.css') }}">
+</head>
+
+<body>
+    <main class="container">
+
+        <header class="page-header">
+            <h1>TriageScope</h1>
+            <p class="subtitle">Cyber Incident Priority Assistant</p>
+        </header>
+
+        <section class="intro">
+            <h2>Incident Assessment</h2>
+            <p>
+                Enter the details of a cybersecurity incident
+                to receive an initial priority assessment.
+            </p>
+            <p>
+                This tool is designed for learning and practice.
+                Do not enter real company or sensitive information.
+            </p>
+        </section>
+
+        <section class="form-section">
+            <h2>Incident Details</h2>
+
+            {% if errors %}
+            <div class="error-box" role="alert">
+                <strong>Please correct the following:</strong>
+                <ul>
+                    {% for error in errors %}
+                    <li>{{ error }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+            {% endif %}
+
+            {% if submitted %}
+            <div class="success-box" role="status">
+                <strong>Incident details submitted successfully.</strong>
+                <p>
+                    All required fields were validated.
+                    The priority assessment feature will be added next.
+                </p>
+            </div>
+            {% endif %}
+
+            <form method="POST" action="{{ url_for('index') }}">
+
+                <div class="form-group">
+                    <label for="incident_type">Incident Type</label>
+                    <select id="incident_type" name="incident_type" required>
+                        <option value="">Select incident type</option>
+                        <option value="phishing"
+                            {% if form_values.get('incident_type') == 'phishing' %}selected{% endif %}>
+                            Phishing
+                        </option>
+                        <option value="malware"
+                            {% if form_values.get('incident_type') == 'malware' %}selected{% endif %}>
+                            Malware
+                        </option>
+                        <option value="unauthorized_access"
+                            {% if form_values.get('incident_type') == 'unauthorized_access' %}selected{% endif %}>
+                            Unauthorized Access
+                        </option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="system_importance">System Importance</label>
+                    <select id="system_importance" name="system_importance" required>
+                        <option value="">Select importance</option>
+                        <option value="low"
+                            {% if form_values.get('system_importance') == 'low' %}selected{% endif %}>
+                            Low
+                        </option>
+                        <option value="medium"
+                            {% if form_values.get('system_importance') == 'medium' %}selected{% endif %}>
+                            Medium
+                        </option>
+                        <option value="high"
+                            {% if form_values.get('system_importance') == 'high' %}selected{% endif %}>
+                            High
+                        </option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="affected_users">Number of Affected Users</label>
+                    <select id="affected_users" name="affected_users" required>
+                        <option value="">Select user impact</option>
+                        <option value="one"
+                            {% if form_values.get('affected_users') == 'one' %}selected{% endif %}>
+                            One User
+                        </option>
+                        <option value="multiple"
+                            {% if form_values.get('affected_users') == 'multiple' %}selected{% endif %}>
+                            Multiple Users
+                        </option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="sensitive_data">
+                        Could Sensitive Information Be Involved?
+                    </label>
+                    <select id="sensitive_data" name="sensitive_data" required>
+                        <option value="">Select an option</option>
+                        <option value="yes"
+                            {% if form_values.get('sensitive_data') == 'yes' %}selected{% endif %}>
+                            Yes
+                        </option>
+                        <option value="no"
+                            {% if form_values.get('sensitive_data') == 'no' %}selected{% endif %}>
+                            No
+                        </option>
+                    </select>
+                </div>
+
+                <button type="submit" class="assess-button">
+                    Assess Incident
+                </button>
+            </form>
+        </section>
+
+        <footer>
+            <p>
+                TriageScope is an educational tool and does not
+                replace established incident response procedures.
+            </p>
+        </footer>
+
+    </main>
+</body>
+</html>
