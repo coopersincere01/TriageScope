@@ -272,3 +272,40 @@ footer {
     outline: 3px solid #93c5fd;
     outline-offset: 2px;
 }
+
+/* Assessment form actions */
+.form-actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+}
+
+.clear-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 14px 20px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--navy);
+    background: var(--white);
+    font: inherit;
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.clear-button:hover {
+    background: #f1f5f9;
+    border-color: #94a3b8;
+}
+
+.clear-button:focus-visible {
+    outline: 3px solid #93c5fd;
+    outline-offset: 2px;
+}
+
+@media (max-width: 480px) {
+    .form-actions {
+        grid-template-columns: 1fr;
+    }
+}
