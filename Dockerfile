@@ -13,7 +13,7 @@ COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy only the application files needed to run TriageScope.
-COPY app.py scoring.py guidance.py ./
+COPY *.py ./
 COPY templates/ ./templates/
 COPY static/ ./static/
 
