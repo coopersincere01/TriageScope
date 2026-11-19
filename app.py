@@ -2,6 +2,7 @@ import os
 from flask import Flask, render_template, request
 from scoring import calculate_priority
 from guidance import build_explanation, build_checklist
+from sample_incidents import SAMPLE_INCIDENTS, SAMPLES_BY_ID
 
 app = Flask(__name__)
 
@@ -38,6 +39,11 @@ def index():
     submitted = False
     result = None
 
+    if request.method == "GET":
+        sample = SAMPLES_BY_ID.get(request.args.get("sample", ""))
+        if sample:
+            form_values = sample["fields"].copy()
+
     if request.method == "POST":
 
         for field, allowed in ALLOWED_VALUES.items():
@@ -70,6 +76,7 @@ def index():
         submitted=submitted,
         form_values=form_values,
         result=result,
+        sample_incidents=SAMPLE_INCIDENTS,
         field_labels=FIELD_LABELS
     ), 400 if errors else 200
 

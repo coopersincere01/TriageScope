@@ -31,6 +31,20 @@
         <section class="form-section">
             <h2>Incident Details</h2>
 
+            <div class="sample-section">
+                <h3>Try a Sample Incident</h3>
+                <p>Choose a fictional scenario to fill in the form.</p>
+                <div class="sample-list">
+                    {% for sample in sample_incidents %}
+                    <a class="sample-card"
+                       href="{{ url_for('index', sample=sample['id']) }}">
+                        <strong>{{ sample['title'] }}</strong>
+                        <span>{{ sample['description'] }}</span>
+                    </a>
+                    {% endfor %}
+                </div>
+            </div>
+
             {% if errors %}
             <div class="error-box" role="alert">
                 <strong>Please correct the following:</strong>
