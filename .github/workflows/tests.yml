@@ -35,6 +35,12 @@ jobs:
       - name: Run automated tests
         run: python -m unittest discover -s tests -v
 
+
+      - name: Smoke-test Docker image
+        run: |
+          docker build -t triagescope-ci .
+          docker run --rm triagescope-ci python -c "from app import app; client = app.test_client(); assert client.get('/health').status_code == 200; assert client.get('/').status_code == 200; assert client.get('/compare').status_code == 200; print('Docker smoke test passed')"
+
   deploy:
     name: Deploy to Google Cloud Run
     needs: test
