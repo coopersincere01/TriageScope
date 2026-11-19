@@ -41,6 +41,9 @@ jobs:
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     timeout-minutes: 30
+    concurrency:
+      group: triagescope-production
+      cancel-in-progress: false
 
     permissions:
       contents: read
@@ -71,17 +74,5 @@ jobs:
       - name: Push Docker image
         run: docker push "$IMAGE"
 
-      - name: Deploy application
-        run: |
-          gcloud run deploy triagescope \
-            --image="$IMAGE" \
-            --project=triagescope \
-            --region=us-central1 \
-            --service-account=168374564156-compute@developer.gserviceaccount.com \
-            --quiet
-
-      - name: Verify live application
-        run: |
-          curl --fail --silent --show-error --retry 5 --retry-delay 3 \
-            https://triagescope-168374564156.us-central1.run.app/health \
-            | python -c 'import json,sys; assert json.load(sys.stdin)["status"] == "ok"'
+      - name: Deploy candidate, verify, and promote
+        run: bash scripts/deploy_safely.sh "$IMAGE"
