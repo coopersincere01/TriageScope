@@ -1,7 +1,7 @@
 # TriageScope
 ### Cyber Incident Priority Assistant
 
-**Status:** MVP Complete — November 2026
+**Status:** MVP and CI/CD implemented — Sprint 3 enhancements in progress
 
 **Live Application:** https://triagescope-168374564156.us-central1.run.app
 
@@ -47,7 +47,7 @@ The application preserves the selected form values after an assessment and displ
 
 I selected these technologies because they meet the course requirements while keeping the application manageable.
 
-The current MVP does not require a database or user accounts. Additional features, including sample incidents and CI/CD, are planned for later development.
+The current MVP does not require a database or user accounts. Sample incident scenarios are planned for Sprint 3. Automated testing and cloud deployment were implemented during Sprint 2.
 
 ## How TriageScope Works
 
@@ -230,6 +230,85 @@ I verified the public website using a private browser window and submitted a tes
 
 A $5 monthly billing budget alert was also configured for the project, with notifications at 50%, 90%, and 100%. These alerts provide spending notifications rather than a guaranteed spending limit.
 
+## Automated Testing and CI/CD
+
+I added GitHub Actions during Sprint 2 to test TriageScope automatically and deploy successful changes to Google Cloud Run.
+
+The workflow is located at `.github/workflows/tests.yml`.
+
+### How the Pipeline Works
+
+1. A push or pull request triggers GitHub Actions.
+2. GitHub installs Python 3.12 and the application dependencies.
+3. The workflow checks Python syntax and runs the automated unittest suite.
+4. If a test fails, the test job fails and deployment cannot proceed.
+5. For successful pushes to `main`, GitHub builds a Docker image and uploads it to Google Artifact Registry.
+6. The deployment script creates a Cloud Run candidate revision without sending production traffic to it.
+7. The script checks the candidate's `/health` endpoint before promoting it to receive production traffic.
+8. A final health check verifies the production URL.
+
+Pull requests run the tests but do not deploy the application.
+
+### Google Cloud Authentication
+
+GitHub Actions uses Workload Identity Federation with a dedicated deployment service account. I chose this approach so the repository does not need a stored service account key.
+
+The identity provider is restricted to this GitHub repository and the `main` branch. The deployment account has permissions to update Cloud Run, upload images to the existing Artifact Registry repository, and use the application's runtime service account.
+
+The workflow uses:
+
+- Project: `triagescope`
+- Region: `us-central1`
+- Cloud Run service: `triagescope`
+- Artifact Registry repository: `cloud-run-source-deploy`
+- Deployment script: `scripts/deploy_safely.sh`
+
+Temporary authentication files are excluded through `.gitignore` and `.dockerignore`.
+
+### Deployment Safety and Recovery
+
+The deployment script records the current production revision before deploying a candidate. It checks the candidate before moving production traffic and includes a command to restore the previous revision if the final health check fails.
+
+The staged deployment process has been tested successfully. **An actual failed-production rollback has not yet been tested**, so the rollback code should not be treated as fully verified.
+
+If manual recovery is necessary, I can review available revisions with:
+
+```bash
+gcloud run revisions list --service=triagescope --region=us-central1 --project=triagescope
+```
+
+After identifying a known working revision, traffic can be restored with:
+
+```bash
+gcloud run services update-traffic triagescope --to-revisions=REVISION_NAME=100 --region=us-central1 --project=triagescope
+```
+
+`REVISION_NAME` must be replaced with the actual verified revision.
+
+### Verification and Troubleshooting
+
+I verified that GitHub Actions successfully tested and deployed the application. The staged deployment created revision `triagescope-00003-hay` with zero production traffic, checked it, and then promoted it to 100% traffic.
+
+I also introduced a temporary failing test on a separate development branch. GitHub Actions reported the failure as expected. I removed the test afterward and confirmed the original 20 tests passed again.
+
+For failed workflows, I review the individual job logs in the GitHub Actions tab. If tests fail, I fix the application or tests before merging. If deployment fails, I review the authentication, image push, Cloud Run revision status, and application logs before retrying.
+
+Cloud Run application logs can be inspected with:
+
+```bash
+gcloud run services logs read triagescope --region=us-central1 --project=triagescope --limit=50
+```
+
+### Sprint 2 Evidence
+
+- [Automated testing — PR #6](https://github.com/coopersincere01/TriageScope/pull/6)
+- [Automatic cloud deployment — PR #7](https://github.com/coopersincere01/TriageScope/pull/7)
+- [Staged deployment safeguards — PR #8](https://github.com/coopersincere01/TriageScope/pull/8)
+- [Successful staged deployment](https://github.com/coopersincere01/TriageScope/actions/runs/44569896438)
+- [Intentional test failure](https://github.com/coopersincere01/TriageScope/actions/runs/44570946924)
+
+AI assistance helped me draft the GitHub Actions workflow and deployment script. I checked the actual workflow results, corrected an issue in how the candidate revision was identified, and verified the staged deployment using GitHub's deployment logs.
+
 ## Testing
 
 Automated testing was used throughout development to make sure new features worked without breaking existing functionality.
@@ -370,12 +449,13 @@ These examples showed me why testing and reviewing AI-assisted code are importan
 
 I used feature branches, descriptive commits, and pull requests to organize development.
 
-Four feature pull requests were completed and merged during the MVP:
+Five pull requests were merged during MVP development:
 
 1. Incident intake form and validation
 2. Rule-based priority scoring
 3. Priority explanations and response checklists
 4. Docker and Docker Compose configuration
+5. README documentation
 
 I tested each major feature before merging it into the main branch.
 
@@ -419,14 +499,16 @@ Focus:
 These core development tasks were completed and tested during the MVP.
 
 ### Sprint 2: Automated Testing and CI/CD
-**November 23–December 6, 2026**
+**Started November 19, 2026, ahead of the original schedule**
 
-Planned improvements:
+Implemented and verified:
 
-- Expand automated testing
-- Add GitHub Actions
-- Automate testing when changes are pushed
-- Explore automated Cloud Run deployment
+- GitHub Actions testing on pushes and pull requests
+- Automatic Cloud Run deployment after passing tests
+- Staged deployment and candidate health verification
+- Intentional failing-test demonstration
+
+Sprint documentation and closeout are being finalized.
 
 ### Sprint 3: Final Improvements
 **December 7–13, 2026**
@@ -445,6 +527,6 @@ The TriageScope MVP is developed, tested, containerized, and deployed.
 
 Completed work includes four core application features, 20 passing automated tests, four merged feature pull requests, Docker Compose verification, and a working Google Cloud Run website.
 
-The next phase will focus on CI/CD, additional functionality, and final refinements before the December 13 project deadline.
+The CI/CD pipeline is implemented and verified. The remaining work focuses on additional application features, final testing, and documentation before the December 13 deadline.
 
 **Security Note:** TriageScope is an educational application. Users should not enter real company incident reports, passwords, or sensitive information.
