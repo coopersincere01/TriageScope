@@ -175,9 +175,14 @@
                     </select>
                 </div>
 
-                <button type="submit" class="assess-button">
-                    Assess Incident
-                </button>
+                <div class="form-actions">
+                    <button type="submit" class="assess-button">
+                        Assess Incident
+                    </button>
+                    <a href="{{ url_for('index') }}" class="clear-button">
+                        Clear Form
+                    </a>
+                </div>
             </form>
         </section>
 
