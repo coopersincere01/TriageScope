@@ -1,7 +1,7 @@
 # TriageScope
 ### Cyber Incident Priority Assistant
 
-**Status:** MVP and CI/CD implemented — Sprint 3 enhancements in progress
+**Status:** MVP, CI/CD, and three enhancements implemented — final verification in progress
 
 **Live Application:** https://triagescope-168374564156.us-central1.run.app
 
@@ -31,6 +31,18 @@ The MVP includes four main features:
 
 The application preserves the selected form values after an assessment and displays validation errors when necessary.
 
+### Sprint 3 Enhancements
+
+I added three features after completing the MVP:
+
+5. **Fictional Sample Incidents:** Users can select one of three practice scenarios to automatically fill in the incident form. These examples cover Low, Medium, and High priority situations.
+
+6. **Clear Form:** Users can reset the incident form and remove the previous assessment without manually clearing each field.
+
+7. **Incident Comparison:** Users can assess two incidents on a separate page, view both scores and priority ratings, and see which incident has the higher score. The page also handles equal scores and invalid submissions.
+
+The comparison page is available at `/compare`. Both incidents use the same scoring rules as the original assessment.
+
 ## Technology Stack
 
 | Component | Technology |
@@ -47,7 +59,7 @@ The application preserves the selected form values after an assessment and displ
 
 I selected these technologies because they meet the course requirements while keeping the application manageable.
 
-The current MVP does not require a database or user accounts. Sample incident scenarios are planned for Sprint 3. Automated testing and cloud deployment were implemented during Sprint 2.
+The application does not require a database or user accounts. Automated testing and cloud deployment were implemented during Sprint 2, followed by three application enhancements during Sprint 3.
 
 ## How TriageScope Works
 
@@ -324,12 +336,12 @@ python -m unittest discover -s tests -v
 ### Verified Results
 
 ```text
-Ran 20 tests
+Ran 35 tests
 
 OK
 ```
 
-The 20 automated tests cover:
+The 35 automated tests cover:
 
 - Homepage and health endpoint availability
 - Valid and invalid incident submissions
@@ -340,6 +352,10 @@ The 20 automated tests cover:
 - Priority results displayed on the website
 - Priority explanations
 - Incident-specific response checklists
+- Sample scenario availability and form preselection
+- Clearing previous assessments and sample selections
+- Incident comparisons, higher scores, and ties
+- Missing and invalid comparison values
 
 I also manually tested the application in the browser, through Docker Compose, and on Google Cloud Run.
 
@@ -459,6 +475,20 @@ Five pull requests were merged during MVP development:
 
 I tested each major feature before merging it into the main branch.
 
+### Sprint 3 Pull Requests
+
+- [Sample incidents — PR #10](https://github.com/coopersincere01/TriageScope/pull/10)
+- [Clear Form — PR #11](https://github.com/coopersincere01/TriageScope/pull/11)
+- [Incident comparison — PR #12](https://github.com/coopersincere01/TriageScope/pull/12)
+
+### Architecture Decisions
+
+I kept incident scoring in `scoring.py` so the original assessment and comparison page use the same rules. Flask handles form validation and page requests, while Jinja2 templates and CSS control the interface.
+
+The fictional scenarios are stored separately in `sample_incidents.py`. This makes them easier to update without changing the scoring calculations.
+
+I used a separate comparison page instead of placing two additional incident forms on the homepage. This keeps the original assessment simpler and avoids making the main interface unnecessarily crowded.
+
 ### Jira
 
 I used Jira to organize development into user stories, subtasks, and three planned sprints.
@@ -508,25 +538,27 @@ Implemented and verified:
 - Staged deployment and candidate health verification
 - Intentional failing-test demonstration
 
-Sprint documentation and closeout are being finalized.
+Sprint 2 was completed and closed in Jira.
 
 ### Sprint 3: Final Improvements
-**December 7–13, 2026**
+**Started November 19, 2026, ahead of the original schedule**
+**Final project deadline: December 13, 2026**
 
-Planned improvements:
+Implemented:
 
-- Add sample incident scenarios
-- Implement a Clear Form option
-- Improve the user experience
-- Resolve remaining issues
-- Complete final project documentation
+- Three fictional sample incident scenarios — TRIAGE-8
+- Clear Form functionality — TRIAGE-11
+- Two-incident comparison — TRIAGE-32
+- Expanded automated tests from 20 to 35
+
+Final usability checks, documentation, project tracking, and deployment verification are still being completed under TRIAGE-29.
 
 ## Current Status
 
-The TriageScope MVP is developed, tested, containerized, and deployed.
+The TriageScope MVP, CI/CD pipeline, and all three new application enhancements have been implemented.
 
-Completed work includes four core application features, 20 passing automated tests, four merged feature pull requests, Docker Compose verification, and a working Google Cloud Run website.
+The application now has 35 passing automated tests. The three new features were tested locally and merged into `main` through separate pull requests.
 
-The CI/CD pipeline is implemented and verified. The remaining work focuses on additional application features, final testing, and documentation before the December 13 deadline.
+The project is in its final verification stage. I still need to confirm the latest cloud deployment, review Google Cloud logs, finish Sprint 3 documentation, and verify access to the final submission links.
 
 **Security Note:** TriageScope is an educational application. Users should not enter real company incident reports, passwords, or sensitive information.
