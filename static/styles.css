@@ -227,3 +227,48 @@ footer {
     font-size: 13px;
     margin-bottom: 0;
 }
+/* Fictional sample incident selection */
+.sample-section {
+    margin: 6px 0 28px;
+}
+
+.sample-section h3 {
+    margin-bottom: 4px;
+}
+
+.sample-section p {
+    color: var(--muted);
+    margin-top: 0;
+}
+
+.sample-list {
+    display: grid;
+    gap: 10px;
+}
+
+.sample-card {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding: 14px 16px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--text);
+    text-decoration: none;
+}
+
+.sample-card span {
+    color: var(--muted);
+    font-size: 13px;
+}
+
+.sample-card:hover,
+.sample-card:focus-visible {
+    border-color: var(--blue);
+    background: #eff6ff;
+}
+
+.sample-card:focus-visible {
+    outline: 3px solid #93c5fd;
+    outline-offset: 2px;
+}
