@@ -81,6 +81,60 @@ def index():
     ), 400 if errors else 200
 
 
+
+@app.route("/compare", methods=["GET", "POST"])
+def compare_incidents():
+    """Compare two incident assessments using the existing rules."""
+
+    errors = []
+    incident_values = {"a": {}, "b": {}}
+    comparisons = None
+    winner = None
+
+    if request.method == "POST":
+        for incident_id in ("a", "b"):
+            for field, allowed in ALLOWED_VALUES.items():
+                value = request.form.get(
+                    f"{incident_id}_{field}", ""
+                ).strip()
+                incident_values[incident_id][field] = value
+
+                if not value:
+                    errors.append(
+                        f"Incident {incident_id.upper()}: "
+                        f"{FIELD_LABELS[field]} is required."
+                    )
+                elif value not in allowed:
+                    errors.append(
+                        f"Incident {incident_id.upper()}: "
+                        f"Invalid selection for {FIELD_LABELS[field]}."
+                    )
+
+        if not errors:
+            comparisons = {
+                incident_id: calculate_priority(incident_values[incident_id])
+                for incident_id in ("a", "b")
+            }
+
+            a_score = comparisons["a"]["score"]
+            b_score = comparisons["b"]["score"]
+
+            if a_score > b_score:
+                winner = "Incident A has the higher assessment score."
+            elif b_score > a_score:
+                winner = "Incident B has the higher assessment score."
+            else:
+                winner = "Both incidents have the same assessment score."
+
+    return render_template(
+        "compare.html",
+        errors=errors,
+        incident_values=incident_values,
+        comparisons=comparisons,
+        winner=winner
+    ), 400 if errors else 200
+
+
 @app.get("/health")
 def health():
     """Health check for Docker and cloud deployment."""

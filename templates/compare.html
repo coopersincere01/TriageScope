@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TriageScope | Compare Incidents</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <main class="container">
+        <header class="page-header">
+            <h1>TriageScope</h1>
+            <p class="subtitle">Cyber Incident Priority Assistant</p>
+        </header>
+
+        <section class="intro">
+            <a class="back-link" href="{{ url_for('index') }}">Back to Incident Assessment</a>
+            <h2>Compare Two Incidents</h2>
+            <p>Enter two fictional incident scenarios to compare their initial priority scores.</p>
+            <p>This is an educational assessment, not a replacement for professional judgment.</p>
+        </section>
+
+        <section class="form-section">
+            {% if errors %}
+            <div class="error-box" role="alert">
+                <strong>Please correct the following:</strong>
+                <ul>
+                    {% for error in errors %}
+                    <li>{{ error }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+            {% endif %}
+
+            {% if comparisons %}
+            <div class="comparison-summary" role="status">
+                <h2>Comparison Results</h2>
+                <p><strong>{{ winner }}</strong></p>
+                <p class="result-notice">
+                    A higher score indicates higher priority according to
+                    TriageScope's educational scoring rules.
+                </p>
+            </div>
+
+            <div class="comparison-grid">
+                {% for incident in ['a', 'b'] %}
+                {% set result = comparisons[incident] %}
+                <div class="assessment-result priority-{{ result.priority|lower }}">
+                    <h3>Incident {{ incident|upper }}</h3>
+                    <p><strong>{{ result.priority }} Priority</strong></p>
+                    <p>Assessment Score:
+                        <strong>{{ result.score }} / {{ result.max_score }}</strong>
+                    </p>
+                    <h4>Score Breakdown</h4>
+                    <ul>
+                        {% for factor in result.factors %}
+                        <li>{{ factor.field.replace('_', ' ').title() }}:
+                            {{ factor.selection.replace('_', ' ').title() }}
+                            ({{ factor.points }} points)
+                        </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+
+            {% set fields = [
+                ('incident_type', 'Incident Type', [
+                    ('phishing', 'Phishing'),
+                    ('malware', 'Malware'),
+                    ('unauthorized_access', 'Unauthorized Access')
+                ]),
+                ('system_importance', 'System Importance', [
+                    ('low', 'Low'), ('medium', 'Medium'), ('high', 'High')
+                ]),
+                ('affected_users', 'Number of Affected Users', [
+                    ('one', 'One User'), ('multiple', 'Multiple Users')
+                ]),
+                ('sensitive_data', 'Could Sensitive Information Be Involved?', [
+                    ('no', 'No'), ('yes', 'Yes')
+                ])
+            ] %}
+
+            <form method="POST" action="{{ url_for('compare_incidents') }}">
+                <div class="comparison-grid">
+                    {% for incident in ['a', 'b'] %}
+                    <fieldset class="comparison-panel">
+                        <legend>Incident {{ incident|upper }}</legend>
+
+                        {% for field, label, options in fields %}
+                        <div class="form-group">
+                            <label for="{{ incident }}_{{ field }}">{{ label }}</label>
+                            <select id="{{ incident }}_{{ field }}"
+                                    name="{{ incident }}_{{ field }}" required>
+                                <option value="">Select an option</option>
+                                {% for value, text in options %}
+                                <option value="{{ value }}"
+                                    {% if incident_values[incident].get(field) == value %}selected{% endif %}>
+                                    {{ text }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        {% endfor %}
+                    </fieldset>
+                    {% endfor %}
+                </div>
+
+                <div class="form-actions">
+                    <button type="submit" class="assess-button">
+                        Compare Incidents
+                    </button>
+                    <a class="clear-button" href="{{ url_for('compare_incidents') }}">
+                        Clear Comparison
+                    </a>
+                </div>
+            </form>
+        </section>
+
+        <footer>
+            <p>Use fictional incident information only. Do not enter sensitive company data.</p>
+        </footer>
+    </main>
+</body>
+</html>
