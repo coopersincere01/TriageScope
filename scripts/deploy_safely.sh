@@ -53,7 +53,16 @@ DETAILS="$(service_details)"
 
 NEW_REVISION="$(
   printf '%s' "$DETAILS" |
-    python3 -c 'import json,sys; print(json.load(sys.stdin)["status"]["latestCreatedRevisionName"])'
+    python3 -c '
+import json, sys
+status = json.load(sys.stdin)["status"]
+matches = [item.get("revisionName") for item in status["traffic"]
+           if item.get("tag") == "candidate"]
+if (len(matches) != 1 or not matches[0]
+        or matches[0] != status.get("latestReadyRevisionName")):
+    sys.exit("Candidate revision is not ready or uniquely tagged")
+print(matches[0])
+'
 )"
 
 CANDIDATE_URL="$(
